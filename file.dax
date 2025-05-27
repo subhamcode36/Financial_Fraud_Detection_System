@@ -1,0 +1,29 @@
+Total Transactions = COUNT(transactions[transaction_id])
+
+Actual Fraud Count = CALCULATE(COUNT(transactions[transaction_id]), transactions[actual_fraud] = 1)
+
+Predicted Fraud Count = CALCULATE(COUNT(transactions[transaction_id]), transactions[predicted_fraud] = 1)
+
+True Positives = CALCULATE(COUNT(transactions[transaction_id]), transactions[actual_fraud] = 1 && transactions[predicted_fraud] = 1)
+
+False Positives = CALCULATE(COUNT(transactions[transaction_id]), transactions[actual_fraud] = 0 && transactions[predicted_fraud] = 1)
+
+False Negatives = CALCULATE(COUNT(transactions[transaction_id]), transactions[actual_fraud] = 1 && transactions[predicted_fraud] = 0)
+
+Accuracy = DIVIDE(
+    CALCULATE(COUNT(transactions[transaction_id]), transactions[actual_fraud] = transactions[predicted_fraud]),
+    [Total Transactions]
+)
+
+Precision = DIVIDE([True Positives], [True Positives] + [False Positives])
+
+Recall = DIVIDE([True Positives], [True Positives] + [False Negatives])
+
+F1 Score = 
+VAR P = [Precision]
+VAR R = [Recall]
+RETURN IF(
+    P + R = 0,
+    BLANK(),
+    2 * P * R / (P + R)
+)
